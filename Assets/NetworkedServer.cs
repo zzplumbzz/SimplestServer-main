@@ -27,7 +27,7 @@ public class NetworkedServer : MonoBehaviour
 
     LinkedList<GameRoom> gameRooms;
 
-    
+
 
     // Start is called before the first frame update
     void Start()
@@ -45,7 +45,7 @@ public class NetworkedServer : MonoBehaviour
 
         LoadPlayerAccounts();
 
-        
+
 
         gameRooms = new LinkedList<GameRoom>();
 
@@ -95,7 +95,7 @@ public class NetworkedServer : MonoBehaviour
         byte[] buffer = Encoding.Unicode.GetBytes(msg);
         NetworkTransport.Send(hostID, id, reliableChannelID, buffer, msg.Length * sizeof(char), out error);
 
-        
+
     }
 
     private void ProcessRecievedMsg(string msg, int id)
@@ -103,7 +103,7 @@ public class NetworkedServer : MonoBehaviour
         Debug.Log("msg recieved = " + msg + ".  connection id = " + id);
 
         string[] csv = msg.Split(',');
-Debug.Log(csv[0]);  
+        Debug.Log(csv[0]);
         int signifier = int.Parse(csv[0]);
 
         if (signifier == ClientToServerSignifiers.CreateAccount)
@@ -206,19 +206,21 @@ Debug.Log(csv[0]);
                 GameRoom gr = new GameRoom(playerWaitingForMatchWithID, id);
                 gameRooms.AddLast(gr);
 
+                SendMessageToClient(ServerToClientSignifiers.PlayerO + ",", gr.playerID2);
+                SendMessageToClient(ServerToClientSignifiers.PlayerX + ",", gr.playerID1);
                 SendMessageToClient(ServerToClientSignifiers.GameStart + ",", gr.playerID2);
                 SendMessageToClient(ServerToClientSignifiers.GameStart + ",", gr.playerID1);
-                SendMessageToClient(ServerToClientSignifiers.SpectatorJoined + ",", gr.spectatorID);
+                //SendMessageToClient(ServerToClientSignifiers.SpectatorJoined + ",", gr.spectatorID);
 
 
                 playerWaitingForMatchWithID = -1;
             }
-            
-            
+
+
         }
-        else if (signifier == ClientToServerSignifiers.TicTacToePlay)// start the game
+        else if (signifier == ClientToServerSignifiers.OpponentPlay)// start the game
         {
-            Debug.Log("GameStart");
+            Debug.Log("Opponents Turn!");
             GameRoom gr = GetGameRoomWithClientID(id);
 
             if (gr != null)
@@ -226,78 +228,43 @@ Debug.Log(csv[0]);
 
                 if (gr.playerID1 == id)
                 {
+                    SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID2);
 
-                    
-                    SendMessageToClient(ServerToClientSignifiers.PlayerTurn + ",Player turn", gr.playerID1);
-                    SendMessageToClient(ServerToClientSignifiers.PlayerTurn + ",Playerturn", gr.playerID2);
-                    //SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "", gr.playerID2);
-                    Debug.Log("Your Turn!");
-                    if(signifier == ClientToServerSignifiers.BoxHitClient)
-                    {
-                        SendMessageToClient(ServerToClientSignifiers.OpponentPlay + ",", gr.playerID1);
-                        SendMessageToClient(ServerToClientSignifiers.OpponentPlay + ",", gr.playerID2);
-                    }
-                    else if(signifier == ServerToClientSignifiers.BoxHitServer)
-                    {
-                        SendMessageToClient(ServerToClientSignifiers.BoxHitServer + ",", gr.playerID1);
-                        SendMessageToClient(ServerToClientSignifiers.BoxHitServer + ",", gr.playerID2);
-
-                        SendMessageToClient(ClientToServerSignifiers.BoxHitClient + ",", gr.playerID1);
-                        SendMessageToClient(ClientToServerSignifiers.BoxHitClient + ",", gr.playerID2);
-                    }
-                     else if(signifier == ClientToServerSignifiers.GGButtonPressed)
-                     {
-                         SendMessageToClient(ClientToServerSignifiers.GGButtonPressed + ",", gr.playerID1);
-                         SendMessageToClient(ClientToServerSignifiers.GGButtonPressed + ",", gr.playerID2);
-
-                         SendMessageToClient(ServerToClientSignifiers.SendGGButtonPressed + ",", gr.playerID1);
-                         SendMessageToClient(ServerToClientSignifiers.SendGGButtonPressed + ",", gr.playerID2);
-                     }
-                     else if (signifier == ClientToServerSignifiers.HelloButtonPressed)
-                     {
-                         SendMessageToClient(ClientToServerSignifiers.HelloButtonPressed + ",", gr.playerID1);
-                         SendMessageToClient(ClientToServerSignifiers.HelloButtonPressed + ",", gr.playerID2);
-
-                         SendMessageToClient(ServerToClientSignifiers.SendHelloButtonPressed + ",", gr.playerID1);
-                         SendMessageToClient(ServerToClientSignifiers.SendHelloButtonPressed + ",", gr.playerID2);
-                     }
-                     else if (signifier == ServerToClientSignifiers.SendGGButtonPressed)
-                     {
-                        SendMessageToClient(ClientToServerSignifiers.GGButtonPressed + ",", gr.playerID1);
-                         SendMessageToClient(ClientToServerSignifiers.GGButtonPressed + ",", gr.playerID2);
-
-                         SendMessageToClient(ServerToClientSignifiers.SendGGButtonPressed + ",", gr.playerID1);
-                         SendMessageToClient(ServerToClientSignifiers.SendGGButtonPressed + ",", gr.playerID2);
-                     }
-                     else if (signifier == ServerToClientSignifiers.SendHelloButtonPressed)
-                     {
-                         SendMessageToClient(ClientToServerSignifiers.HelloButtonPressed + ",", gr.playerID1);
-                         SendMessageToClient(ClientToServerSignifiers.HelloButtonPressed + ",", gr.playerID2);
-
-                         SendMessageToClient(ServerToClientSignifiers.SendHelloButtonPressed + ",", gr.playerID1);
-                         SendMessageToClient(ServerToClientSignifiers.SendHelloButtonPressed + ",", gr.playerID2);
-                     }
                 }
             }
             else
             {
+                SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID1);
 
-                SendMessageToClient(ServerToClientSignifiers.OpponentPlay + ",", gr.playerID1);
-                SendMessageToClient(ServerToClientSignifiers.OpponentPlay + ",", gr.playerID2);
-                Debug.Log("Opponents Turn!");
             }
-            if(signifier == ClientToServerSignifiers.TicTacToePlay)
-            {
-                SendMessageToClient(ServerToClientSignifiers.OpponentPlay + ",", gr.spectatorID);
-                spectatorJoiningMatchWithID = -1;
-            }
-            
+
 
 
         }
+        else if (signifier == ClientToServerSignifiers.GameOver)
+        {
+            GameRoom gr = GetGameRoomWithClientID(id);
+            string winnerID = csv[1];
+            if (gr != null)
+            {
 
-        
+                if (gr.playerID1 == id)
+                {
+                    SendMessageToClient(ServerToClientSignifiers.GameOver + "," + csv[1], gr.playerID2);
+
+                }
+
+                else
+                {
+                    SendMessageToClient(ServerToClientSignifiers.GameOver + "," + csv[1], gr.playerID1);
+
+                }
+            }
+        }
+
+
     }
+
 
     private void SavePlayerAccounts()// save the players account on creation
     {
@@ -349,49 +316,45 @@ Debug.Log(csv[0]);
 
     }
 
-    private void HitBoxHit(int id, string[] csv)
+    private void TTTButtonHit(int id, string[] csv)
     {
         GameRoom gr = GetGameRoomWithClientID(id);
-         string box = csv[1];
-        
+        string button = csv[1];
+
         int signifier = int.Parse(csv[0]);
 
-        SendMessageToClient(ServerToClientSignifiers.BoxHitServer + box, gr.playerID1);
-        SendMessageToClient(ServerToClientSignifiers.BoxHitServer + box, gr.playerID2);
 
-        SendMessageToClient(ClientToServerSignifiers.BoxHitClient + box, gr.playerID1);
-        SendMessageToClient(ClientToServerSignifiers.BoxHitClient + box, gr.playerID2);
     }
 
-    private void SendMessageToClients(string msg, int id)
-    {
-        GameRoom gr = GetGameRoomWithClientID(id);
-        string[] csv = msg.Split(',');
+    // private void SendMessageToClients(string msg, int id)
+    // {
+    //     GameRoom gr = GetGameRoomWithClientID(id);
+    //     string[] csv = msg.Split(',');
 
-        int signifier = int.Parse(msg);
+    //     int signifier = int.Parse(msg);
 
-        if (signifier == ClientToServerSignifiers.GGButtonPressed)
-        {
-            SendMessageToClient(ClientToServerSignifiers.GGButtonPressed + ",GG ButtonPressed", gr.playerID2);
-            SendMessageToClient(ClientToServerSignifiers.GGButtonPressed + ",GG ButtonPressed", gr.playerID1);
-        }
-        else if(signifier == ClientToServerSignifiers.HelloButtonPressed)
-        {
-            SendMessageToClient(ClientToServerSignifiers.HelloButtonPressed + ",Hello ButtonPressed", gr.playerID2);
-            SendMessageToClient(ClientToServerSignifiers.HelloButtonPressed + ",Hello ButtonPressed", gr.playerID1);
-        }
+    //     if (signifier == ClientToServerSignifiers.GGButtonPressed)
+    //     {
+    //         SendMessageToClient(ClientToServerSignifiers.GGButtonPressed + ",GG ButtonPressed", gr.playerID2);
+    //         SendMessageToClient(ClientToServerSignifiers.GGButtonPressed + ",GG ButtonPressed", gr.playerID1);
+    //     }
+    //     else if(signifier == ClientToServerSignifiers.HelloButtonPressed)
+    //     {
+    //         SendMessageToClient(ClientToServerSignifiers.HelloButtonPressed + ",Hello ButtonPressed", gr.playerID2);
+    //         SendMessageToClient(ClientToServerSignifiers.HelloButtonPressed + ",Hello ButtonPressed", gr.playerID1);
+    //     }
 
-        if (signifier == ServerToClientSignifiers.SendGGButtonPressed)
-        {
-            SendMessageToClient(ServerToClientSignifiers.SendGGButtonPressed + ",GG ButtonPressed", gr.playerID2);
-            SendMessageToClient(ServerToClientSignifiers.SendGGButtonPressed + ",GG ButtonPressed", gr.playerID1);
-        }
-        else if (signifier == ServerToClientSignifiers.SendHelloButtonPressed)
-        {
-            SendMessageToClient(ServerToClientSignifiers.SendHelloButtonPressed + ",Hello ButtonPressed", gr.playerID2);
-            SendMessageToClient(ServerToClientSignifiers.SendHelloButtonPressed + ",Hello ButtonPressed", gr.playerID1);
-        }
-    }
+    //     if (signifier == ServerToClientSignifiers.SendGGButtonPressed)
+    //     {
+    //         SendMessageToClient(ServerToClientSignifiers.SendGGButtonPressed + ",GG ButtonPressed", gr.playerID2);
+    //         SendMessageToClient(ServerToClientSignifiers.SendGGButtonPressed + ",GG ButtonPressed", gr.playerID1);
+    //     }
+    //     else if (signifier == ServerToClientSignifiers.SendHelloButtonPressed)
+    //     {
+    //         SendMessageToClient(ServerToClientSignifiers.SendHelloButtonPressed + ",Hello ButtonPressed", gr.playerID2);
+    //         SendMessageToClient(ServerToClientSignifiers.SendHelloButtonPressed + ",Hello ButtonPressed", gr.playerID1);
+    //     }
+    // }
 
 
     private GameRoom GetGameRoomWithClientID(int id)// create the game room when there are 2 players, spectator can join also
@@ -404,11 +367,11 @@ Debug.Log(csv[0]);
             {
                 return gr;
             }
-            if(gr.spectatorID == id)
+            if (gr.spectatorID == id)
             {
                 Debug.Log("Spectator Joined!!!!!!!!!!");
             }
-                
+
         }
         return null;
     }
@@ -433,50 +396,43 @@ Debug.Log(csv[0]);
         {
             playerID1 = PlayerID1;
             playerID2 = PlayerID2;
-            
-            
-            
-            
+
+
+
+
 
         }
-        
+
     }
 }
 public static class ClientToServerSignifiers
 {
     public const int CreateAccount = 1;
-
     public const int Login = 2;
-
     public const int JoinQueueForGameRoom = 3;
-
     public const int TicTacToePlay = 4;
-    public const int BoxHitClient = 5;
+    public const int PlayerX = 5;
+    public const int PlayerO = 6;
+    public const int OpponentPlay = 7;
+    public const int YouWin = 8;
+    public const int YouLoose = 9;
+    public const int GameOver = 10;
 
-
-
-    public const int GGButtonPressed = 6;
-    public const int HelloButtonPressed = 7;
-    public const int SwitchTurnClient = 8;
 }
 
 public static class ServerToClientSignifiers
 {
     public const int LoginComplete = 11;
     public const int LoginFailed = 12;
-
-
     public const int AccountCreationComplete = 13;
     public const int AccountCreationFailed = 14;
     public const int GameStart = 15;
-    public const int PlayerTurn = 16;
-    public const int OpponentPlay = 17;
-    public const int BoxHitServer = 18;
-    public const int SpectatorJoined = 19;
-    public const int SendGGButtonPressed = 20;
-    public const int SendHelloButtonPressed = 21;
-    public const int SwitchTurnServer = 22;
-    public const int Win = 23;
+    public const int OpponentPlay = 16;
+    public const int PlayerX = 17;
+    public const int PlayerO = 18;
+    public const int YouWin = 19;
+    public const int YouLoose = 20;
+    public const int GameOver = 21;
 
 }
 
