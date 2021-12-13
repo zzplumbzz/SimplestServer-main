@@ -231,14 +231,13 @@ public class NetworkedServer : MonoBehaviour
                     SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID2);
 
                 }
-            }
-            else
-            {
-                SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID1);
+                else
+                {
+                    SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID1);
+
+                }
 
             }
-
-
 
         }
         else if (signifier == ClientToServerSignifiers.GameOver)
@@ -316,15 +315,15 @@ public class NetworkedServer : MonoBehaviour
 
     }
 
-    private void TTTButtonHit(int id, string[] csv)
-    {
-        GameRoom gr = GetGameRoomWithClientID(id);
-        string button = csv[1];
+    // private void TTTButtonHit(int id, string[] csv)
+    // {
+    //     GameRoom gr = GetGameRoomWithClientID(id);
+    //     string button = csv[1];
 
-        int signifier = int.Parse(csv[0]);
+    //     int signifier = int.Parse(csv[0]);
 
 
-    }
+    // }
 
     // private void SendMessageToClients(string msg, int id)
     // {
