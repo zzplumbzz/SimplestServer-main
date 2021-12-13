@@ -228,10 +228,11 @@ public class NetworkedServer : MonoBehaviour
 
                 if (gr.playerID1 == id)
                 {
+                    
                     SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID2);
 
                 }
-                else
+                else if(gr.playerID2 == id)
                 {
                     SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID1);
 
