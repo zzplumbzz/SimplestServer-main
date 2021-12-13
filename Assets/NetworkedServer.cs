@@ -414,9 +414,8 @@ public static class ClientToServerSignifiers
     public const int PlayerX = 5;
     public const int PlayerO = 6;
     public const int OpponentPlay = 7;
-    public const int YouWin = 8;
-    public const int YouLoose = 9;
-    public const int GameOver = 10;
+   
+    public const int GameOver = 8;
 
 }
 
@@ -430,9 +429,8 @@ public static class ServerToClientSignifiers
     public const int OpponentPlay = 16;
     public const int PlayerX = 17;
     public const int PlayerO = 18;
-    public const int YouWin = 19;
-    public const int YouLoose = 20;
-    public const int GameOver = 21;
+  public const int SwitchTurns = 19;
+    public const int GameOver = 20;
 
 }
 
