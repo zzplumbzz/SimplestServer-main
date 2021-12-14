@@ -230,6 +230,7 @@ public class NetworkedServer : MonoBehaviour
                 {
                     
                     SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID2);
+                    
 
                 }
                 else if(gr.playerID2 == id)
@@ -257,6 +258,26 @@ public class NetworkedServer : MonoBehaviour
                 else
                 {
                     SendMessageToClient(ServerToClientSignifiers.GameOver + "," + csv[1], gr.playerID1);
+
+                }
+            }
+        }
+        else if (signifier == ClientToServerSignifiers.RestartGame)
+        {
+            GameRoom gr = GetGameRoomWithClientID(id);
+            string resetGame = (csv[1]);
+            if (gr != null)
+            {
+
+                if (gr.playerID1 == id)
+                {
+                    SendMessageToClient(ServerToClientSignifiers.RestartGame + "," + csv[1], gr.playerID2);
+
+                }
+
+                else
+                {
+                    SendMessageToClient(ServerToClientSignifiers.RestartGame + "," + csv[1], gr.playerID1);
 
                 }
             }
@@ -414,8 +435,9 @@ public static class ClientToServerSignifiers
     public const int PlayerX = 5;
     public const int PlayerO = 6;
     public const int OpponentPlay = 7;
-   
-    public const int GameOver = 8;
+   public const int GridSpaceButtonPressed = 8;
+    public const int GameOver = 9;
+    public const int RestartGame = 10;
 
 }
 
@@ -431,6 +453,7 @@ public static class ServerToClientSignifiers
     public const int PlayerO = 18;
   public const int SwitchTurns = 19;
     public const int GameOver = 20;
+    public const int RestartGame = 21;
 
 }
 
