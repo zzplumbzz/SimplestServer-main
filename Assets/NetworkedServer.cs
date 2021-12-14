@@ -27,6 +27,8 @@ public class NetworkedServer : MonoBehaviour
 
     LinkedList<GameRoom> gameRooms;
 
+   
+
 
 
     // Start is called before the first frame update
@@ -218,25 +220,25 @@ public class NetworkedServer : MonoBehaviour
 
 
         }
-        else if(signifier == ClientToServerSignifiers.GridSpaceButtonPressed)
-        {
-            GameRoom gr = GetGameRoomWithClientID(id);
+        // else if(signifier == ClientToServerSignifiers.GridSpaceButtonPressed)
+        // {
+        //     GameRoom gr = GetGameRoomWithClientID(id);
 
-            string gridSpace = csv[1];
-            if (gr != null)
-            {
-                gr.moveCount++;
+        //     string gridSpace = csv[1];
+        //     if (gr != null)
+        //     {
+        //         gr.moveCount++;
 
-                SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpace + "," + csv[1] + csv[2], gr.playerID2);
-                SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpace + "," + csv[1] + csv[2], gr.playerID1);
-                if (gr.moveCount <= 9)
-                {
-                    SendMessageToClient(ClientToServerSignifiers.GameOver + "," + csv[1] + csv[2], gr.playerID1);
-                    SendMessageToClient(ClientToServerSignifiers.GameOver + "," + csv[1] + csv[2], gr.playerID2);
-                }
-            }
-        } 
-        else if (signifier == ClientToServerSignifiers.OpponentPlay)// start the game
+        //         SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpace + "," + csv[1] + csv[2], gr.playerID2);
+        //         SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpace + "," + csv[1] + csv[2], gr.playerID1);
+        //         if (gr.moveCount <= 9)
+        //         {
+        //             SendMessageToClient(ClientToServerSignifiers.GameOver + "," + csv[1] + csv[2], gr.playerID1);
+        //             SendMessageToClient(ClientToServerSignifiers.GameOver + "," + csv[1] + csv[2], gr.playerID2);
+        //         }
+        //     }
+        // } 
+        else if (signifier == ClientToServerSignifiers.OpponentPlay)
         {
             Debug.Log("Opponents Turn!");
             GameRoom gr = GetGameRoomWithClientID(id);
@@ -251,11 +253,7 @@ public class NetworkedServer : MonoBehaviour
                     
 
                 }
-                else if(gr.playerID2 == id)
-                {
-                    SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID1);
-
-                }
+                
 
             }
 
@@ -429,18 +427,19 @@ public class NetworkedServer : MonoBehaviour
 
     public class GameRoom
     {
-        public int playerID1, playerID2;
+        public int playerID1 = 1, playerID2;
+
+        public int currentPlayerGR;
         public int spectatorID;
         public int moveCount;
+
+        
         public GameRoom(int PlayerID1, int PlayerID2)
         {
             playerID1 = PlayerID1;
             playerID2 = PlayerID2;
 
-
-
-
-
+            currentPlayerGR = playerID1;
         }
 
     }
