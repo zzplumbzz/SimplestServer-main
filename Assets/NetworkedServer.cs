@@ -229,6 +229,11 @@ public class NetworkedServer : MonoBehaviour
 
                 SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpace + "," + csv[1] + csv[2], gr.playerID2);
                 SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpace + "," + csv[1] + csv[2], gr.playerID1);
+                if (gr.moveCount <= 9)
+                {
+                    SendMessageToClient(ClientToServerSignifiers.GameOver + "," + csv[1] + csv[2], gr.playerID1);
+                    SendMessageToClient(ClientToServerSignifiers.GameOver + "," + csv[1] + csv[2], gr.playerID2);
+                }
             }
         } 
         else if (signifier == ClientToServerSignifiers.OpponentPlay)// start the game
