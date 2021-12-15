@@ -34,7 +34,7 @@ public class NetworkedServer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Server Running");
+
         NetworkTransport.Init();
         ConnectionConfig config = new ConnectionConfig();
         reliableChannelID = config.AddChannel(QosType.Reliable);
@@ -220,6 +220,24 @@ public class NetworkedServer : MonoBehaviour
 
 
         }
+
+        else if (signifier == ClientToServerSignifiers.TicTacToePlay)//joining queue for game room
+        {
+            int gridSpot = int.Parse(csv[1]);
+
+            Debug.Log("Grid_ServerSide: "+gridSpot);
+            GameRoom gr = GetGameRoomWithClientID(id);
+            if (gr.playerID1 == id)
+            {
+                SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpot, gr.playerID2);
+            }
+            else
+            {
+                SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpot, gr.playerID1);
+            }
+
+        }
+
         // else if(signifier == ClientToServerSignifiers.GridSpaceButtonPressed)
         // {
         //     GameRoom gr = GetGameRoomWithClientID(id);
@@ -240,7 +258,6 @@ public class NetworkedServer : MonoBehaviour
         // } 
         else if (signifier == ClientToServerSignifiers.OpponentPlay)
         {
-            Debug.Log("Opponents Turn!");
             GameRoom gr = GetGameRoomWithClientID(id);
 
             if (gr != null)
@@ -248,12 +265,12 @@ public class NetworkedServer : MonoBehaviour
 
                 if (gr.playerID1 == id)
                 {
-                    
+
                     SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID2);
-                    
+
 
                 }
-                
+
 
             }
 
@@ -305,12 +322,12 @@ public class NetworkedServer : MonoBehaviour
 
     private void SavePlayerAccounts()// save the players account on creation
     {
-        Debug.Log("Start of SavePlayerAccounts");
+
         StreamWriter sw = new StreamWriter(playerAccountsFilePath);
 
         foreach (PlayerAccount pa in playerAccounts)
         {
-            Debug.Log("ForEach SavePlayerAccounts");
+
             sw.WriteLine(PlayerAccountNameAndPassword + "," + pa.name + "," + pa.password);
         }
         sw.Close();
@@ -318,11 +335,11 @@ public class NetworkedServer : MonoBehaviour
 
     private void LoadPlayerAccounts()// load players account on login
     {
-        Debug.Log("Start LoadPlayerAccounts");
+
         if (File.Exists(playerAccountsFilePath))
         {
 
-            Debug.Log("Start File.Exists");
+
 
             StreamReader sr = new StreamReader(playerAccountsFilePath);
 
@@ -330,7 +347,7 @@ public class NetworkedServer : MonoBehaviour
 
             while (true)
             {
-                Debug.Log("Start while(True)");
+
                 line = sr.ReadLine();
                 if (line == null)
                     break;
@@ -341,13 +358,13 @@ public class NetworkedServer : MonoBehaviour
 
                 if (signifier == PlayerAccountNameAndPassword)
                 {
-                    Debug.Log("Start signifier == PlayerAccountNameAndPassword");
+
                     PlayerAccount pa = new PlayerAccount(csv[1], csv[2]);
                     playerAccounts.AddLast(pa);
                 }
 
             }
-            Debug.Log("Load account complete!");
+
             sr.Close();
         }
 
@@ -396,17 +413,17 @@ public class NetworkedServer : MonoBehaviour
 
     private GameRoom GetGameRoomWithClientID(int id)// create the game room when there are 2 players, spectator can join also
     {
-        Debug.Log("game room start");
+
         foreach (GameRoom gr in gameRooms)
         {
-            Debug.Log("Game room for each");
+
             if (gr.playerID1 == id || gr.playerID2 == id)
             {
                 return gr;
             }
             if (gr.spectatorID == id)
             {
-                Debug.Log("Spectator Joined!!!!!!!!!!");
+
             }
 
         }
@@ -475,5 +492,3 @@ public static class ServerToClientSignifiers
      public const int RestartGame = 21;
 
 }
-
-
