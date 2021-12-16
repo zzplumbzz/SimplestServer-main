@@ -230,32 +230,46 @@ public class NetworkedServer : MonoBehaviour
             if (gr.playerID1 == id)
             {
                 SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpot, gr.playerID2);
+                SendMessageToClient(ServerToClientSignifiers.GridSpaceButtonPressed + "," + gridSpot, gr.playerID2);
             }
             else
             {
                 SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpot, gr.playerID1);
+                SendMessageToClient(ServerToClientSignifiers.GridSpaceButtonPressed + "," + gridSpot, gr.playerID1);
             }
 
         }
 
-        // else if(signifier == ClientToServerSignifiers.GridSpaceButtonPressed)
-        // {
-        //     GameRoom gr = GetGameRoomWithClientID(id);
+        else if(signifier == ClientToServerSignifiers.GridSpaceButtonPressed)
+        {
+            GameRoom gr = GetGameRoomWithClientID(id);
 
-        //     string gridSpace = csv[1];
-        //     if (gr != null)
-        //     {
-        //         gr.moveCount++;
+            int switchSides = int.Parse(csv[1]);
+            int gridSpot = int.Parse(csv[1]);
+            if (gr != null)
+            {
+                gr.moveCount++;
+                if (gr.playerID1 == id)
+            {
+                 SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + switchSides + "," + csv[1] + csv[2], gr.playerID2);
+                 SendMessageToClient(ServerToClientSignifiers.BoardIsNotInteractable + "," + switchSides + "," + csv[1] + csv[2], gr.playerID2);
+                 SendMessageToClient(ServerToClientSignifiers.BoardIsInteractable + "," + switchSides + "," + csv[1] + csv[2], gr.playerID1);
+            }
+             else  
+             {
+                 SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + switchSides + "," + csv[1] + csv[2], gr.playerID1);
+                 SendMessageToClient(ServerToClientSignifiers.BoardIsNotInteractable + "," + switchSides + "," + csv[1] + csv[2], gr.playerID1);
+                 SendMessageToClient(ServerToClientSignifiers.BoardIsInteractable + "," + switchSides + "," + csv[1] + csv[2], gr.playerID2);
+             }
 
-        //         SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpace + "," + csv[1] + csv[2], gr.playerID2);
-        //         SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpace + "," + csv[1] + csv[2], gr.playerID1);
-        //         if (gr.moveCount <= 9)
-        //         {
-        //             SendMessageToClient(ClientToServerSignifiers.GameOver + "," + csv[1] + csv[2], gr.playerID1);
-        //             SendMessageToClient(ClientToServerSignifiers.GameOver + "," + csv[1] + csv[2], gr.playerID2);
-        //         }
-        //     }
-        // } 
+                
+                // if (gr.moveCount <= 9)
+                // {
+                //     SendMessageToClient(ClientToServerSignifiers.GameOver + "," + csv[1] + csv[2], gr.playerID1);
+                //     SendMessageToClient(ClientToServerSignifiers.GameOver + "," + csv[1] + csv[2], gr.playerID2);
+                // }
+            }
+        } 
         else if (signifier == ClientToServerSignifiers.OpponentPlay)
         {
             GameRoom gr = GetGameRoomWithClientID(id);
@@ -267,12 +281,14 @@ public class NetworkedServer : MonoBehaviour
                 {
 
                     SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID2);
+                    SendMessageToClient(ServerToClientSignifiers.GridSpaceButtonPressed + "," + csv[1] + csv[2], gr.playerID2);
 
 
                 }
                 else/////////////////////////
                 {
                     SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID1);///////////////////////
+                    SendMessageToClient(ServerToClientSignifiers.GridSpaceButtonPressed + "," + csv[1] + csv[2], gr.playerID1);
                 }
 
 
@@ -496,7 +512,7 @@ public static class ServerToClientSignifiers
     public const int OpponentPlay = 18;
     public const int PlayerXTurn = 19;
     public const int PlayerOTurn = 20;
-  public const int SwitchTurns = 21;
+  public const int GridSpaceButtonPressed = 21;
     public const int GameOver = 22;
      public const int RestartGame = 23;
      public const int BoardIsInteractable = 24;
