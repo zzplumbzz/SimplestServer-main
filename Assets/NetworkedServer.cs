@@ -223,52 +223,20 @@ public class NetworkedServer : MonoBehaviour
 
         else if (signifier == ClientToServerSignifiers.TicTacToePlay)//joining queue for game room
         {
-            int gridSpot = int.Parse(csv[1]);
+            int gridSpace = int.Parse(csv[1]);
 
-            Debug.Log("Grid_ServerSide: "+gridSpot);
+            
             GameRoom gr = GetGameRoomWithClientID(id);
+            
             if (gr.playerID1 == id)
             {
-                SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpot, gr.playerID2);
-                SendMessageToClient(ServerToClientSignifiers.GridSpaceButtonPressed + "," + gridSpot, gr.playerID2);
+                SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpace, gr.playerID2);
             }
             else
             {
-                SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpot, gr.playerID1);
-                SendMessageToClient(ServerToClientSignifiers.GridSpaceButtonPressed + "," + gridSpot, gr.playerID1);
+                SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + gridSpace, gr.playerID1);
             }
 
-        }
-
-        else if(signifier == ClientToServerSignifiers.GridSpaceButtonPressed)
-        {
-            GameRoom gr = GetGameRoomWithClientID(id);
-
-            int switchSides = int.Parse(csv[1]);
-            int gridSpot = int.Parse(csv[1]);
-            if (gr != null)
-            {
-                gr.moveCount++;
-                if (gr.playerID1 == id)
-            {
-                 SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + switchSides + "," + csv[1] + csv[2], gr.playerID2);
-                 SendMessageToClient(ServerToClientSignifiers.BoardIsNotInteractable + "," + switchSides + "," + csv[1] + csv[2], gr.playerID2);
-                 SendMessageToClient(ServerToClientSignifiers.BoardIsInteractable + "," + switchSides + "," + csv[1] + csv[2], gr.playerID1);
-            }
-             else  
-             {
-                 SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + switchSides + "," + csv[1] + csv[2], gr.playerID1);
-                 SendMessageToClient(ServerToClientSignifiers.BoardIsNotInteractable + "," + switchSides + "," + csv[1] + csv[2], gr.playerID1);
-                 SendMessageToClient(ServerToClientSignifiers.BoardIsInteractable + "," + switchSides + "," + csv[1] + csv[2], gr.playerID2);
-             }
-
-                
-                // if (gr.moveCount <= 9)
-                // {
-                //     SendMessageToClient(ClientToServerSignifiers.GameOver + "," + csv[1] + csv[2], gr.playerID1);
-                //     SendMessageToClient(ClientToServerSignifiers.GameOver + "," + csv[1] + csv[2], gr.playerID2);
-                // }
-            }
         } 
         else if (signifier == ClientToServerSignifiers.OpponentPlay)
         {
@@ -281,15 +249,10 @@ public class NetworkedServer : MonoBehaviour
                 {
 
                     SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID2);
-                    SendMessageToClient(ServerToClientSignifiers.GridSpaceButtonPressed + "," + csv[1] + csv[2], gr.playerID2);
 
 
                 }
-                else/////////////////////////
-                {
-                    SendMessageToClient(ServerToClientSignifiers.OpponentPlay + "," + csv[1] + csv[2], gr.playerID1);///////////////////////
-                    SendMessageToClient(ServerToClientSignifiers.GridSpaceButtonPressed + "," + csv[1] + csv[2], gr.playerID1);
-                }
+                
 
 
             }
@@ -390,47 +353,6 @@ public class NetworkedServer : MonoBehaviour
 
     }
 
-    // private void TTTButtonHit(int id, string[] csv)
-    // {
-    //     GameRoom gr = GetGameRoomWithClientID(id);
-    //     string button = csv[1];
-
-    //     int signifier = int.Parse(csv[0]);
-
-
-    // }
-
-    // private void SendMessageToClients(string msg, int id)
-    // {
-    //     GameRoom gr = GetGameRoomWithClientID(id);
-    //     string[] csv = msg.Split(',');
-
-    //     int signifier = int.Parse(msg);
-
-    //     if (signifier == ClientToServerSignifiers.GGButtonPressed)
-    //     {
-    //         SendMessageToClient(ClientToServerSignifiers.GGButtonPressed + ",GG ButtonPressed", gr.playerID2);
-    //         SendMessageToClient(ClientToServerSignifiers.GGButtonPressed + ",GG ButtonPressed", gr.playerID1);
-    //     }
-    //     else if(signifier == ClientToServerSignifiers.HelloButtonPressed)
-    //     {
-    //         SendMessageToClient(ClientToServerSignifiers.HelloButtonPressed + ",Hello ButtonPressed", gr.playerID2);
-    //         SendMessageToClient(ClientToServerSignifiers.HelloButtonPressed + ",Hello ButtonPressed", gr.playerID1);
-    //     }
-
-    //     if (signifier == ServerToClientSignifiers.SendGGButtonPressed)
-    //     {
-    //         SendMessageToClient(ServerToClientSignifiers.SendGGButtonPressed + ",GG ButtonPressed", gr.playerID2);
-    //         SendMessageToClient(ServerToClientSignifiers.SendGGButtonPressed + ",GG ButtonPressed", gr.playerID1);
-    //     }
-    //     else if (signifier == ServerToClientSignifiers.SendHelloButtonPressed)
-    //     {
-    //         SendMessageToClient(ServerToClientSignifiers.SendHelloButtonPressed + ",Hello ButtonPressed", gr.playerID2);
-    //         SendMessageToClient(ServerToClientSignifiers.SendHelloButtonPressed + ",Hello ButtonPressed", gr.playerID1);
-    //     }
-    // }
-
-
     private GameRoom GetGameRoomWithClientID(int id)// create the game room when there are 2 players, spectator can join also
     {
 
@@ -493,29 +415,22 @@ public static class ClientToServerSignifiers
     public const int GridSpaceButtonPressed = 8;
     public const int GameOver = 9;
     public const int RestartGame = 10;
-    public const int BoardIsInteractable = 11;
-    public const int BoardIsNotInteractable = 12;
-
     
-    
-
 
 }
 
 public static class ServerToClientSignifiers
 {
-    public const int LoginComplete = 13;
-    public const int LoginFailed = 14;
-    public const int AccountCreationComplete = 15;
-    public const int AccountCreationFailed = 16;
-    public const int GameStart = 17;
-    public const int OpponentPlay = 18;
-    public const int PlayerXTurn = 19;
-    public const int PlayerOTurn = 20;
-  public const int GridSpaceButtonPressed = 21;
-    public const int GameOver = 22;
-     public const int RestartGame = 23;
-     public const int BoardIsInteractable = 24;
-    public const int BoardIsNotInteractable = 25;
+    public const int LoginComplete = 11;
+    public const int LoginFailed = 12;
+    public const int AccountCreationComplete = 13;
+    public const int AccountCreationFailed = 14;
+    public const int GameStart = 15;
+    public const int OpponentPlay = 16;
+    public const int PlayerXTurn = 17;
+    public const int PlayerOTurn = 18;
+  public const int SwitchTurns = 19;
+    public const int GameOver = 20;
+     public const int RestartGame = 21;
 
 }
